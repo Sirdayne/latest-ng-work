@@ -1,0 +1,12 @@
+.navigation {
+
+  &-list {
+    width: 200px;
+  }
+
+  &-link {
+    &:hover {
+      @apply bg-gray-400;
+    }
+  }
+}

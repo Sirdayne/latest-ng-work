@@ -1,0 +1,12 @@
+<div mat-dialog-title>
+  <div *ngIf="data && data.title" class="text-center">{{ data.title }}</div>
+</div>
+<div mat-dialog-content>
+  <div *ngIf="data && data.content" class="text-center">{{ data.content }}</div>
+</div>
+<div mat-dialog-actions>
+  <div class="mt-4 mb-6" fxFlex="auto" fxLayout="row" fxLayoutAlign="space-between center">
+    <button color="primary" mat-button (click)="dialogRef.close(this.data.id)">Ok</button>
+    <button mat-button (click)="dialogRef.close()">Cancel</button>
+  </div>
+</div>

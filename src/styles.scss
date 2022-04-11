@@ -1,0 +1,19 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import 'styles/material-fixes/index';
+@import 'styles/scrollbar/index';
+@import 'styles/main-container/index';
+@import 'styles/navigation/index';
+@import 'styles/components/index';
+@import 'styles/as-split-area/index';
+/* You can add global styles to this file, and also import other style files */
+
+html { height: 100%; background: #f1f1f1; }
+body { margin: 0; height: 100%; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.main-logo {
+  img {
+    width: 130px;
+  }
+}

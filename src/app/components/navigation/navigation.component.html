@@ -1,0 +1,13 @@
+<div class="p-2 navigation-list">
+  <a
+    *ngFor="let item of navigationLinks;"
+    routerLinkActive="bg-blue-900 text-primary-500 text-white"
+    [routerLinkActiveOptions]="{exact: true}"
+    class="list-item py-3 px-9 mt-2 font-medium no-underline text-center rounded-full navigation-link"
+    matRipple
+    [routerLink]="item.path"
+  >
+    {{ item.label }}
+  </a>
+</div>
+

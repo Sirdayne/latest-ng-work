@@ -1,0 +1,110 @@
+<div class="w-full bg-white" style="min-width: 600px;">
+
+  <div class="px-6 py-2">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+      <div class="mb-4"><span class="text-blue-700">clOrdID</span>: {{ clOrdID }}</div>
+
+      <div class="mt-2">
+        <mat-form-field>
+          <mat-label>Security</mat-label>
+          <input matInput formControlName="symbol">
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Period</mat-label>
+          <input matInput formControlName="repoPeriod" type="number">
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Side</mat-label>
+          <mat-select required formControlName="side">
+            <mat-option *ngFor="let item of sides" [value]="item.value">{{item.label}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Order Type</mat-label>
+          <mat-select required formControlName="ordType">
+            <mat-option *ngFor="let item of types" [value]="item.value">{{item.label}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="f['ordType'].value === 1">
+        <mat-form-field>
+          <mat-label>Time In Force</mat-label>
+          <mat-select required formControlName="timeInForce">
+            <mat-option *ngFor="let item of timeInForces" [value]="item.value">{{item.label}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Rate, %</mat-label>
+          <input matInput formControlName="repoRate" type="number">
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Auto Repo Amount</mat-label>
+          <input matInput formControlName="autoRepoAmount" type="number">
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Auto Order Quantity</mat-label>
+          <input matInput formControlName="autoOrderQty" type="number">
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Repurchase Date</mat-label>
+          <input matInput formControlName="repurchaseDate"
+                 [matDatepicker]="repurchaseDate"
+          >
+          <mat-datepicker-toggle matSuffix [for]="repurchaseDate"></mat-datepicker-toggle>
+          <mat-datepicker #repurchaseDate></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Repurchase Amount</mat-label>
+          <input matInput formControlName="repurchaseAmount">
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Repo Price</mat-label>
+          <input matInput formControlName="repoPrice">
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Investor</mat-label>
+          <input matInput formControlName="investor">
+        </mat-form-field>
+      </div>
+
+      <mat-error *ngIf="error" class="mb-2">{{ error }}</mat-error>
+
+      <button color="primary" mat-raised-button type="submit" [disabled]="loading" [class.spinner]="loading">CONFIRM</button>
+      <span class="ml-2">
+        <button (click)="onReject()" color="warn" mat-raised-button type="button" [disabled]="loading" [class.spinner]="loading">REJECT</button>
+      </span>
+    </form>
+  </div>
+</div>

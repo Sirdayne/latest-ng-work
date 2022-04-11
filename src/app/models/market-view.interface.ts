@@ -1,0 +1,31 @@
+export interface MarketViewI {
+  id: string;
+  mdReqId: string;
+  security: string;
+  period: number;
+  currency: string;
+  assetClass: string;
+  refPrice: number;
+  haircut: number;
+  repoPrice: number;
+  openRepoRate: number;
+  highRepoRate: number;
+  lowRepoRate: number;
+  lastRepoRate: number;
+  previousCloseRepoRate: number;
+  repoRateChange: number;
+  dailyVolume: number;
+  dailyValue: number;
+  numberOfTrades: number;
+  buyerAmount: number;
+  buyerQty: number;
+  buyerRate: number;
+  sellerAmount: number;
+  sellerQty: number;
+  sellerRate: number;
+  textName: number;
+  errorMessage: number;
+  createdBy: string;
+  modifiedBy: number;
+  state: string;
+}

@@ -1,0 +1,47 @@
+<div class="h-full">
+  <div class="bg-gray-200">
+    <div fxFlex="100%" fxLayout="row" fxLayoutAlign="space-between center">
+      <app-table-title [label]="label"></app-table-title>
+
+      <div class="pt-1">
+        <div *ngIf="view" class="cursor-pointer inline-block" (click)="addView.emit()">
+          <mat-icon>add</mat-icon>
+        </div>
+
+        <div *ngIf="view" class="cursor-pointer inline-block" (click)="selectView.emit('')">
+          <mat-icon>reorder</mat-icon>
+        </div>
+
+        <div *ngIf="isDownloadCSVAvailable" class="cursor-pointer inline-block" (click)="toggleSearch()">
+          <mat-icon>{{ isSearchShown ? 'find_replace' : 'search' }}</mat-icon>
+        </div>
+
+        <div *ngIf="isDownloadCSVAvailable" class="cursor-pointer inline-block" (click)="downloadCSV(view)">
+          <mat-icon>play_for_work</mat-icon>
+        </div>
+
+        <div class="cursor-pointer inline-block pr-4" (click)="removeView.emit(null)">
+          <mat-icon>close</mat-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!view" class="view-container pt-5" fxLayoutAlign="center center" fxLayout="column" fxLayoutGap="10px">
+    <button color="primary" mat-raised-button type="button" (click)="this.selectView.emit('market-trades')">Market Trades</button>
+    <button color="primary" mat-raised-button type="button" (click)="this.selectView.emit('market-view')">Market View</button>
+    <button color="primary" mat-raised-button type="button" (click)="this.selectView.emit('order-entry')">Order Entry</button>
+    <button color="primary" mat-raised-button type="button" (click)="this.selectView.emit('my-orders')">My Orders</button>
+    <button color="primary" mat-raised-button type="button" (click)="this.selectView.emit('my-trades')">My Trades</button>
+  </div>
+
+  <div *ngIf="view" class="view-container">
+    <app-order-entry *ngIf="view === 'order-entry'"></app-order-entry>
+    <app-market-trades *ngIf="view === 'market-trades'" [downloadCSVSubject]="downloadCSVSubject" [isSearchShown]="isSearchShown"></app-market-trades>
+    <app-market-view *ngIf="view === 'market-view'" [downloadCSVSubject]="downloadCSVSubject" [isSearchShown]="isSearchShown"></app-market-view>
+    <app-my-orders *ngIf="view === 'my-orders'" [downloadCSVSubject]="downloadCSVSubject" [isSearchShown]="isSearchShown"></app-my-orders>
+    <app-my-trades *ngIf="view === 'my-trades'" [downloadCSVSubject]="downloadCSVSubject" [isSearchShown]="isSearchShown"></app-my-trades>
+  </div>
+
+</div>
+

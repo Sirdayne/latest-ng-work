@@ -1,0 +1,69 @@
+<div class="w-full" style="min-width: 1500px;">
+
+  <app-search-table [tableColumns]="tableColumns"
+                    [initData]="initData"
+                    (setFilteredData)="setFilteredData($event)"
+                    [isSearchShown]="isSearchShown"
+  ></app-search-table>
+
+  <table mat-table [dataSource]="dataSource" matSort>
+
+    <ng-container matColumnDef="transactTime">
+      <th mat-header-cell mat-sort-header *matHeaderCellDef>Time</th>
+      <td mat-cell *matCellDef="let item">{{item.transactTime }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell mat-sort-header *matHeaderCellDef>Status</th>
+      <td mat-cell *matCellDef="let item"> {{item.status}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="security">
+      <th mat-header-cell mat-sort-header *matHeaderCellDef>Security</th>
+      <td mat-cell *matCellDef="let item"> {{item.security}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="period">
+      <th mat-header-cell mat-sort-header *matHeaderCellDef>Duration</th>
+      <td mat-cell *matCellDef="let item"> {{item.period}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="price">
+      <th mat-header-cell mat-sort-header *matHeaderCellDef>Repo Price</th>
+      <td mat-cell *matCellDef="let item"> {{item.price }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="rate">
+      <th mat-header-cell mat-sort-header *matHeaderCellDef>Repo Rate</th>
+      <td mat-cell *matCellDef="let item"> {{item.rate }}%</td>
+    </ng-container>
+
+    <ng-container matColumnDef="quantity">
+      <th mat-header-cell mat-sort-header *matHeaderCellDef>Quantity</th>
+      <td mat-cell *matCellDef="let item"> {{item.quantity}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="amount">
+      <th mat-header-cell mat-sort-header *matHeaderCellDef>Amount</th>
+      <td mat-cell *matCellDef="let item"> {{item.amount }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="repurchaseDate">
+      <th mat-header-cell mat-sort-header *matHeaderCellDef>Repurchase Date</th>
+      <td mat-cell *matCellDef="let item">{{item.repurchaseDate }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="repurchaseAmount">
+      <th mat-header-cell mat-sort-header *matHeaderCellDef>Repurchase Value</th>
+      <td mat-cell *matCellDef="let item"> {{item.repurchaseAmount }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="deltaRepoIncome">
+      <th mat-header-cell mat-sort-header *matHeaderCellDef>Delta (Repo Income)</th>
+      <td mat-cell *matCellDef="let item">{{item.deltaRepoIncome }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>

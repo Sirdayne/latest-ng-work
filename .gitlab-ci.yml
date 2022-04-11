@@ -1,0 +1,7 @@
+variables:
+ APP_NAME: repo-webtrader
+
+include:
+ - project: 'itops/core-pipepline'
+   file: '/docker_projects/core_pipeline.yml'
+#   file: '/pm_projects/core_pipeline.yml'

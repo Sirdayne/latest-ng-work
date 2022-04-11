@@ -1,0 +1,9 @@
+.card {
+  @apply bg-white rounded shadow-xl;
+}
+
+.view-container {
+  width: 100%;
+  height: calc(100% - 40px);
+  overflow: auto;
+}

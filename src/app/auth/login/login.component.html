@@ -1,0 +1,46 @@
+<div>
+  <div class="flex w-full h-full py-10 items-center justify-center">
+    <div class="px-8 py-8 card" style="width: 350px;">
+      <div>
+        <div fxLayoutAlign="center center">
+          <img src="assets/images/aix-logo.svg" alt="logo" style="width: 230px;">
+        </div>
+      </div>
+
+      <form class="mt-8" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div>
+          <mat-form-field fxFlex="100%">
+            <mat-label>Username</mat-label>
+            <input matInput formControlName="username">
+            <mat-error *ngIf="form.get('username').invalid && submitted">
+              Username field is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field fxFlex="100%">
+            <mat-label>Password</mat-label>
+            <input matInput formControlName="password" type="password">
+            <mat-error *ngIf="form.get('password').invalid && submitted">
+              Password field is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="mt-4">
+          <mat-error *ngIf="authError">
+            {{ authError }}
+          </mat-error>
+        </div>
+
+        <div class="mt-6 flex justify-center">
+          <button mat-raised-button color="primary"
+                  type="submit"
+                  [disabled]="loading"
+                  [class.spinner]="loading">LOGIN</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
