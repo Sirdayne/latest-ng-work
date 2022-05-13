@@ -1,9 +1,18 @@
-<div class="w-full bg-white" style="min-width: 600px;">
+<div class="w-full bg-white" style="min-width: 400px;">
 
   <div class="px-6 py-2">
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-      <div class="mb-4"><span class="text-blue-700">clOrdID</span>: {{ clOrdID }}</div>
+      <div>
+        <div class="mb-4" fxFlex="auto" fxLayout="row" fxLayoutAlign="space-between center">
+          <div>
+            <span class="text-blue-700">clOrdID</span>: {{ clOrdID }}
+          </div>
+          <span class="cursor-pointer" (click)="closeForm()">
+           <mat-icon>close</mat-icon>
+          </span>
+        </div>
+      </div>
 
       <div class="mt-2">
         <mat-form-field>
@@ -104,6 +113,9 @@
       <button color="primary" mat-raised-button type="submit" [disabled]="loading" [class.spinner]="loading">CONFIRM</button>
       <span class="ml-2">
         <button (click)="onReject()" color="warn" mat-raised-button type="button" [disabled]="loading" [class.spinner]="loading">REJECT</button>
+      </span>
+      <span class="ml-2">
+        <button (click)="closeForm()" color="warn" mat-raised-button type="button" [disabled]="loading" [class.spinner]="loading">BACK</button>
       </span>
     </form>
   </div>

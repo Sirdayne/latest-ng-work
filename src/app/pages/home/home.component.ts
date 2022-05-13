@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import {AuthService} from '../../auth/login/auth.service';
 import { select, Store } from '@ngrx/store';
 import { IAppState } from '../../core/store/state/app.state';
-import { selectCurrentUser } from '../../core/store/selectors/user.selectors';
+import { selectCurrentRole, selectCurrentUser } from '../../core/store/selectors/user.selectors';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { TokenService } from '../../auth/token.service';
@@ -20,40 +20,43 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   layouts = [
     {
+      size: 50,
       views: [
         {
           name: 'market-view',
           size: 40
         },
         {
-          name: 'order-entry',
-          size: 30
+          name: '',
+          size: 40
         },
         {
-          name: '',
-          size: 30
-        }
+          name: 'order-entry',
+          size: 20
+        },
       ]
     },
     {
+      size: 50,
       views: [
         {
           name: 'my-orders',
-          size: 33
+          size: 25
         },
         {
           name: 'my-trades',
-          size: 33
+          size: 25
         },
         {
           name: 'market-trades',
-          size: 33
+          size: 50
         }
       ]
     }
   ];
 
-  username = 'Unknown';
+  username = '';
+  role;
   LAYOUTS_LOCAL_STORAGE_NAME = 'web_trader_layouts';
 
   constructor(private cdRef: ChangeDetectorRef,
@@ -67,16 +70,24 @@ export class HomeComponent implements OnInit, OnDestroy {
       select(selectCurrentUser),
       filter(user => user !== null)
     ).subscribe(user => {
-      this.username = user && user.name ? user.name : 'Unknown';
+      this.username = user && user.name ? user.name : '';
+    }));
+
+    this.subscription.add(this.store.pipe(
+      select(selectCurrentRole),
+      filter(role => role !== null)
+    ).subscribe(role => {
+      this.role = role;
+      this.getFromStorage();
     }));
   }
 
   ngOnInit(): void {
-    this.getFromStorage();
   }
 
   addLayout() {
     this.layouts.push({
+      size: 25,
       views: []
     });
   }
@@ -112,10 +123,21 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (layouts) {
       try {
         this.layouts = JSON.parse(layouts);
+        if (this.isFirmViewer) {
+          this.removeOrderEntryFromLayouts();
+        }
       } catch (e) {
         console.log('Parse Cache Error:' + e);
       }
     }
+  }
+
+  removeOrderEntryFromLayouts() {
+    this.layouts.forEach(layout => {
+      layout.views.forEach(view => {
+        view.name = view.name === 'order-entry' ? '' : view.name;
+      });
+    });
   }
 
   trackByFn(index, item) {
@@ -130,6 +152,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     views.forEach((view, index) => {
       view.size = sizes[index];
     });
+  }
+
+  dragEndLayout({ sizes }) {
+    this.layouts.forEach((layout, index) => {
+      layout.size = sizes[index];
+    });
+  }
+
+  get isFirmViewer() {
+    return this.role === 'Firm Viewer';
   }
 
   ngOnDestroy(): void {

@@ -101,7 +101,7 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef>Order Cancellation</th>
       <td mat-cell *matCellDef="let item">
-        <button *ngIf="item.status === 'CONFIRMED' || item.status === 'PARTIALLY_MATCHED'; else alreadyCancelled" color="primary" mat-raised-button type="button" (click)="cancelOrder(item)">
+        <button *ngIf="!isFirmViewer && (item.status === 'CONFIRMED' || item.status === 'PARTIALLY_MATCHED'); else alreadyCancelled" color="primary" mat-raised-button type="button" (click)="cancelOrder(item)">
           CANCEL ORDER
         </button>
         <ng-template #alreadyCancelled>Can't be cancelled</ng-template>

@@ -2,13 +2,11 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 
 
-export interface LoginResponseI {
-  accessToken: string;
-}
-
 export interface CurrentUserI {
+  accessToken?: string;
   senderCompID: string;
   senderSubID: string;
+  userRole: string;
 }
 
 @Injectable({
@@ -23,7 +21,11 @@ export class AuthService {
   }
 
   login(body) {
-    return this.httpService.post<LoginResponseI>('/login', body);
+    return this.httpService.post<CurrentUserI>('/login', body);
+  }
+
+  resetPassword(body) {
+    return this.httpService.post<CurrentUserI>('/login', body);
   }
 
   logout() {

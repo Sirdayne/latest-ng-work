@@ -1,0 +1,9 @@
+<div *ngIf="prev && current">
+  <div *ngIf="prev < current">
+    <mat-icon color="primary">trending_up</mat-icon>
+  </div>
+  <div *ngIf="prev > current">
+    <mat-icon color="warn">trending_down</mat-icon>
+  </div>
+
+</div>

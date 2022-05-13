@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { MarketViewService } from './market-view.service';
 import {SocketService} from '../home/socket.service';
 import {finalize} from 'rxjs/operators';
@@ -16,8 +16,8 @@ import {MatTableDataSource} from '@angular/material/table';
 export class MarketViewComponent implements OnInit, OnDestroy {
   @Input() downloadCSVSubject: Subject<any>;
   @Input() isSearchShown;
-  isHighlighted = false;
 
+  prevInitData;
   initData;
   dataSource;
   state = 'market-view';
@@ -135,15 +135,13 @@ export class MarketViewComponent implements OnInit, OnDestroy {
         this.getMarketView()
       }
     }));
-    // this.simulateHighlightNewRecord();
-
     this.onDownloadCSVSubject();
   }
 
   onDownloadCSVSubject() {
-    this.subscription.add(this.downloadCSVSubject.subscribe((view) => {
+    this.subscription.add(this.downloadCSVSubject.subscribe(({ view, delimiter }) => {
       if (view === 'market-view') {
-        this.importService.json2csv(view, this.dataSource._renderData._value, this.tableColumns);
+        this.importService.json2csv(view, this.dataSource._renderData._value, this.tableColumns, delimiter);
       }
     }));
   }
@@ -153,6 +151,7 @@ export class MarketViewComponent implements OnInit, OnDestroy {
     this.marketViewService.getMarketView().pipe(
       finalize(() => this.loading = false)
     ).subscribe(marketView => {
+      this.prevInitData = this.initData ? this.initData : [];
       this.initData = this.formatData(marketView);
       this.dataSource = new MatTableDataSource(this.initData);
       this.dataSource.sort = this.sort;
@@ -180,17 +179,6 @@ export class MarketViewComponent implements OnInit, OnDestroy {
     return data;
   }
 
-  simulateHighlightNewRecord() {
-    // setTimeout(() => {
-    //   this.isHighlighted = true;
-    //   this.dataSource[0].refPrice = 100;
-    // }, 3000);
-  }
-
-  unHighlight() {
-    this.isHighlighted = false
-  }
-
   selectOrderDepth(row) {
     this.security = row.security;
     this.period = row.period;
@@ -210,6 +198,16 @@ export class MarketViewComponent implements OnInit, OnDestroy {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+  }
+
+  getPrevItem(item, key) {
+    const found = this.prevInitData.find(iterable => {
+      const { security, period, currency } = iterable;
+      if (security === item.security && period === item.period && currency === item.currency) {
+        return item;
+      }
+    });
+    return found && found[key] ? found[key] : null;
   }
 
   get displayedColumns() {

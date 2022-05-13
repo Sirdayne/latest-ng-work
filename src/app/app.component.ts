@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
     this.authService.getCurrentUser().subscribe(res => {
       this.store.dispatch(setUser( { user: {
         name: res.senderSubID,
-        role: 'Trader'
+        role: res.userRole
       }}));
 
       this.socketService.createSocketConnection();

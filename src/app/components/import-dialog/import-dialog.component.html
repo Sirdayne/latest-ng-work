@@ -1,0 +1,9 @@
+<div mat-dialog-title>
+  <div class="text-center">Choose CSV Separator</div>
+</div>
+<div mat-dialog-actions>
+  <div class="mt-4 mb-6" fxFlex="auto" fxLayout="row" fxLayoutAlign="space-between center">
+    <button color="primary" mat-raised-button (click)="dialogRef.close(';')">Import Metric(;)</button>
+    <button color="primary" mat-raised-button (click)="dialogRef.close(',')">Import US(,)</button>
+  </div>
+</div>

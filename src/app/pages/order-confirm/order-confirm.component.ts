@@ -15,7 +15,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 export class OrderConfirmComponent implements OnInit {
   @Input() orderConfirm: OrderConfirmI;
   @Output() setStep = new EventEmitter();
-  step = 'start';
+  @Output() resetParentForm = new EventEmitter();
   form: FormGroup;
   loading = false;
   error;
@@ -144,8 +144,16 @@ export class OrderConfirmComponent implements OnInit {
     });
   }
 
+  closeForm() {
+    this.setStep.emit('');
+    this.form.reset();
+    this.clOrdID = null;
+    this.confirmReqID = null;
+  }
+
   resetForm() {
     this.setStep.emit('');
+    this.resetParentForm.emit();
     this.form.reset();
     this.clOrdID = null;
     this.confirmReqID = null;

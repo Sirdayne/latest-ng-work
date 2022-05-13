@@ -35,92 +35,183 @@
 
     <ng-container matColumnDef="refPrice">
       <th mat-header-cell mat-sort-header *matHeaderCellDef>Ref Price</th>
-      <td mat-cell *matCellDef="let item; let i = index" [class.highlight]="i === 0 && isHighlighted" (mouseleave)="unHighlight()">{{item.refPrice }}</td>
+      <td mat-cell *matCellDef="let item;">
+        <app-cell
+          [current]="item.refPrice"
+          [prev]="getPrevItem(item, 'refPrice')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="haircut">
       <th mat-header-cell mat-sort-header *matHeaderCellDef>Haircut</th>
-      <td mat-cell *matCellDef="let item">{{item.haircut }}%</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.haircut"
+          [currentWithPercent]="true"
+          [prev]="getPrevItem(item, 'haircut')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="repoPrice">
       <th mat-header-cell mat-sort-header *matHeaderCellDef>Repo Price</th>
-      <td mat-cell *matCellDef="let item">{{item.repoPrice }}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.repoPrice"
+          [prev]="getPrevItem(item, 'repoPrice')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="buyerQty">
       <th mat-header-cell mat-sort-header *matHeaderCellDef class="bg-lime-500">Quantity To Lend</th>
-      <td mat-cell *matCellDef="let item">{{item.buyerQty}}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.buyerQty"
+          [prev]="getPrevItem(item, 'buyerQty')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="buyerAmount">
       <th mat-header-cell mat-sort-header *matHeaderCellDef class="bg-lime-500">Amount To Lend</th>
-      <td mat-cell *matCellDef="let item">{{item.buyerAmount }}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+        [current]="item.buyerAmount"
+        [prev]="getPrevItem(item, 'buyerAmount')"
+      ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="buyerRate">
       <th mat-header-cell mat-sort-header *matHeaderCellDef class="bg-lime-500">Lender Repo Rate</th>
-      <td mat-cell *matCellDef="let item">{{item.buyerRate }}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.buyerRate"
+          [prev]="getPrevItem(item, 'buyerRate')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="sellerRate">
       <th mat-header-cell mat-sort-header *matHeaderCellDef class="bg-yellow-300">Borrower Repo Rate</th>
-      <td mat-cell *matCellDef="let item">{{item.sellerRate }}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.sellerRate"
+          [prev]="getPrevItem(item, 'sellerRate')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="sellerAmount">
       <th mat-header-cell mat-sort-header *matHeaderCellDef class="bg-yellow-300">Amount To Borrow</th>
-      <td mat-cell *matCellDef="let item">{{item.sellerAmount | number : '1.2-2' | noComma}}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.sellerAmount"
+          [prev]="getPrevItem(item, 'sellerAmount')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="sellerQty">
       <th mat-header-cell mat-sort-header *matHeaderCellDef class="bg-yellow-300">Quantity To Borrow</th>
-      <td mat-cell *matCellDef="let item">{{item.sellerQty}}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.sellerQty"
+          [prev]="getPrevItem(item, 'sellerQty')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="openRepoRate">
       <th mat-header-cell mat-sort-header *matHeaderCellDef>Open Repo Rate</th>
-      <td mat-cell *matCellDef="let item">{{item.openRepoRate }}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.openRepoRate"
+          [prev]="getPrevItem(item, 'openRepoRate')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="highRepoRate">
       <th mat-header-cell mat-sort-header *matHeaderCellDef>High Repo Rate</th>
-      <td mat-cell *matCellDef="let item">{{item.highRepoRate }}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.highRepoRate"
+          [prev]="getPrevItem(item, 'highRepoRate')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="lowRepoRate">
       <th mat-header-cell mat-sort-header *matHeaderCellDef>Low Repo Rate</th>
-      <td mat-cell *matCellDef="let item">{{item.lowRepoRate }}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.lowRepoRate"
+          [prev]="getPrevItem(item, 'lowRepoRate')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="lastRepoRate">
       <th mat-header-cell mat-sort-header *matHeaderCellDef>Last Repo Rate</th>
-      <td mat-cell *matCellDef="let item">{{item.lastRepoRate }}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.lastRepoRate"
+          [prev]="getPrevItem(item, 'lastRepoRate')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="previousCloseRepoRate">
       <th mat-header-cell mat-sort-header *matHeaderCellDef>Previous Close Repo Rate</th>
-      <td mat-cell *matCellDef="let item">{{item.previousCloseRepoRate }}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.previousCloseRepoRate"
+          [prev]="getPrevItem(item, 'previousCloseRepoRate')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="repoRateChange">
       <th mat-header-cell mat-sort-header *matHeaderCellDef>Repo Rate Change</th>
-      <td mat-cell *matCellDef="let item">{{item.repoRateChange }}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.repoRateChange"
+          [prev]="getPrevItem(item, 'repoRateChange')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="dailyVolume">
       <th mat-header-cell mat-sort-header *matHeaderCellDef>Daily Volume</th>
-      <td mat-cell *matCellDef="let item">{{item.dailyVolume}}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.dailyVolume"
+          [prev]="getPrevItem(item, 'dailyVolume')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="dailyValue">
       <th mat-header-cell mat-sort-header *matHeaderCellDef>Daily Value</th>
-      <td mat-cell *matCellDef="let item">{{item.dailyValue }}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.dailyValue"
+          [prev]="getPrevItem(item, 'dailyValue')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="numberOfTrades">
       <th mat-header-cell mat-sort-header *matHeaderCellDef>Number Of Trades</th>
-      <td mat-cell *matCellDef="let item">{{item.numberOfTrades}}</td>
+      <td mat-cell *matCellDef="let item">
+        <app-cell
+          [current]="item.numberOfTrades"
+          [prev]="getPrevItem(item, 'numberOfTrades')"
+        ></app-cell>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="actions">

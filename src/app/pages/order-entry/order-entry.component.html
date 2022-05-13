@@ -1,4 +1,4 @@
-<div class="w-full bg-white" style="min-width: 600px;">
+<div class="w-full bg-white" style="min-width: 400px;">
 
   <div *ngIf="step !== 'order-confirm'" class="px-6 py-2">
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -81,5 +81,6 @@
     *ngIf="step === 'order-confirm'"
     [orderConfirm]="orderConfirm"
     (setStep)="setStep($event)"
+    (resetParentForm)="resetParentForm()"
   ></app-order-confirm>
 </div>

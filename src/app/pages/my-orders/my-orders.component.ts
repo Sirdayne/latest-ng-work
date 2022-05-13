@@ -19,6 +19,7 @@ import { MatTableDataSource } from '@angular/material/table';
 export class MyOrdersComponent implements OnInit, OnDestroy {
   @Input() downloadCSVSubject: Subject<any>;
   @Input() isSearchShown;
+  @Input() isFirmViewer;
 
   tableColumns = [
     {
@@ -121,9 +122,9 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
   }
 
   onDownloadCSVSubject() {
-    this.subscription.add(this.downloadCSVSubject.subscribe((view) => {
+    this.subscription.add(this.downloadCSVSubject.subscribe(({ view, delimiter }) => {
       if (view === 'my-orders') {
-        this.importService.json2csv(view, this.dataSource._renderData._value, this.tableColumns);
+        this.importService.json2csv(view, this.dataSource._renderData._value, this.tableColumns, delimiter);
       }
     }));
   }
@@ -170,7 +171,6 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
 
     this.subscription.add(
       dialogRef.afterClosed().subscribe(clientOrderId => {
-        console.log(clientOrderId, ' CANCEL ORDER RESULT');
         if (clientOrderId) {
           this.myOrdersService.cancelOrder(clientOrderId).subscribe(res => {});
         }

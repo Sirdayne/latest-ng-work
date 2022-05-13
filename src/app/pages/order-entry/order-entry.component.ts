@@ -69,7 +69,6 @@ export class OrderEntryComponent implements OnInit {
     ).subscribe(res => {
       this.orderConfirm = res;
       this.step = 'order-confirm';
-      this.form.reset();
     }, err => {
       this.error = err && err.error && err.error.message ? err.error.message : "Error: Invalid Data";
     });
@@ -101,5 +100,9 @@ export class OrderEntryComponent implements OnInit {
 
   setStep(step) {
     this.step = step;
+  }
+
+  resetParentForm() {
+    this.form.reset();
   }
 }

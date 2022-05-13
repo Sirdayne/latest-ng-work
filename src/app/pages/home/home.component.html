@@ -5,8 +5,8 @@
     </div>
 
     <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
-      <button color="primary" mat-raised-button type="button" style="cursor: default;" [disableRipple]="true">
-        {{ username }}
+      <button *ngIf="username" color="primary" mat-raised-button type="button" style="cursor: default;" [disableRipple]="true">
+        {{ username }} <span *ngIf="role">| {{ role }}</span>
       </button>
 
       <button color="primary" mat-raised-button type="button" (click)="saveToStorage()">
@@ -26,11 +26,18 @@
 
 <div style="height: calc(100vh - 60px);">
   <div style="height: 100%;">
-    <as-split direction="vertical">
-      <as-split-area *ngFor="let layout of layouts; let layoutIndex = index; trackBy: trackByFn">
+    <as-split direction="vertical" (dragEnd)="dragEndLayout($event)">
+      <as-split-area *ngFor="let layout of layouts; let layoutIndex = index; trackBy: trackByFn" [size]="layout.size">
         <as-split direction="horizontal" unit="percent" (dragEnd)="dragEnd(layout.views, $event)">
           <as-split-area *ngFor="let view of layout.views; let i = index; trackBy: trackByFn" [size]="view.size">
-            <app-choose-view [view]="view.name" (selectView)="selectView($event, layoutIndex, i)" (removeView)="removeView(layout.views, i)" (addView)="addView(layout.views)"></app-choose-view>
+            <app-choose-view
+              [view]="view.name"
+              (selectView)="selectView($event, layoutIndex, i)"
+              (removeView)="removeView(layout.views, i)"
+              (addView)="addView(layout.views)"
+              [isFirmViewer]="isFirmViewer"
+            >
+            </app-choose-view>
           </as-split-area>
 
           <div *ngIf="layout && layout.views && layout.views.length === 0" fxFlex="100%">

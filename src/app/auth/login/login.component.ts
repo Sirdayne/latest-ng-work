@@ -4,10 +4,11 @@ import { Router } from '@angular/router';
 import { IAppState } from '../../core/store/state/app.state';
 import { Store } from '@ngrx/store';
 import { setUser } from '../../core/store/actions/user.actions';
-import {AuthService, LoginResponseI} from './auth.service';
-import {finalize} from 'rxjs/operators';
+import { AuthService, CurrentUserI } from './auth.service';
+import { finalize } from 'rxjs/operators';
 import { TokenService } from '../token.service';
 import { SocketService } from '../../pages/home/socket.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 
@@ -27,7 +28,8 @@ export class LoginComponent implements OnInit {
               private store: Store<IAppState>,
               private authService: AuthService,
               private tokenService: TokenService,
-              private socketService: SocketService) {
+              private socketService: SocketService,
+              private snackBar: MatSnackBar) {
     this.form = fb.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required]]
@@ -43,13 +45,13 @@ export class LoginComponent implements OnInit {
     this.authError = '';
     this.authService.login(this.form.getRawValue()).pipe(
       finalize(() => this.loading = false)
-    ).subscribe((res: LoginResponseI) => {
+    ).subscribe((res: CurrentUserI) => {
       if (res && res.accessToken) {
         this.tokenService.setToken(res.accessToken);
         this.socketService.createSocketConnection();
         this.store.dispatch(setUser( { user: {
-            name: this.form.get('username')?.value,
-            role: 'Trader'
+            name: res.senderSubID,
+            role: res.userRole
           }}));
         if (this.form.valid) {
           this.router.navigateByUrl('/');
@@ -59,7 +61,13 @@ export class LoginComponent implements OnInit {
       }
     }, (err) => {
       this.authError = err && err.error && err.error.message ? err.error.message : "Authentication failed";
+      const RESET_PASSWORD_TAG = '925';
+      if (this.authError.includes(RESET_PASSWORD_TAG)) {
+        this.router.navigate(['/reset-password'], { queryParams: { username: this.form?.get('username')?.value }});
+        this.snackBar.open('Password expired', 'CLOSE', {
+          duration: 3000,
+        });
+      }
     });
   }
-
 }

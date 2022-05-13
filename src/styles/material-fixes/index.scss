@@ -6,14 +6,9 @@
   height: 30px;
 }
 
-.mat-cell.highlight {
-  background: #9ea1ff;
+.highlight {
+  background: #d4d5ff;
 }
-
-.mat-form-field {
-  margin-top: -10px;
-}
-
 
 @keyframes spinner {
   to {transform: rotate(360deg);}

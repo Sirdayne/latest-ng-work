@@ -8,8 +8,8 @@ export class ImportService {
 
   constructor() { }
 
-  json2csv(filename, json, columns) {
-    const json2csvParser = new Parser({ fields: columns, delimiter: ';' });
+  json2csv(filename, json, columns, delimiter = ';') {
+    const json2csvParser = new Parser({ fields: columns, delimiter });
     const csv = json2csvParser.parse(json);
     const csvContent = 'data:text/csv;charset=utf-8,' + csv;
     const encodedUri = encodeURI(csvContent);

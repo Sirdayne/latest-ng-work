@@ -103,9 +103,9 @@ export class MyTradesComponent implements OnInit, OnDestroy {
   }
 
   onDownloadCSVSubject() {
-    this.subscription.add(this.downloadCSVSubject.subscribe((view) => {
+    this.subscription.add(this.downloadCSVSubject.subscribe(({ view, delimiter }) => {
       if (view === 'my-trades') {
-        this.importService.json2csv(view, this.dataSource._renderData._value, this.tableColumns);
+        this.importService.json2csv(view, this.dataSource._renderData._value, this.tableColumns, delimiter);
       }
     }));
   }

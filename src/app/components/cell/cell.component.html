@@ -1,0 +1,10 @@
+<div fxLayout="row" fxLayoutAlign="start center"
+     [class.highlight]="isHighlight"
+     (mouseleave)="isHovered = true"
+>
+  {{current}} <span *ngIf="currentWithPercent">%</span>
+  <app-value-change *ngIf="isHighlight"
+                    [current]="current"
+                    [prev]="prev"
+  ></app-value-change>
+</div>

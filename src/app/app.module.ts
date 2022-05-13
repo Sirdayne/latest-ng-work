@@ -21,12 +21,16 @@ import { HomeComponent } from './pages/home/home.component';
 import { TableTitleComponent } from './components/table-title/table-title.component';
 import { CoreModule } from './core/core.module';
 import { ChooseViewComponent } from './components/choose-view/choose-view.component';
-import {HTTP_INTERCEPTORS, HttpClientModule, HttpErrorResponse} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { HttpTokenInterceptor } from './core/interceptors/http.token.interceptor';
 import { OrderConfirmComponent } from './pages/order-confirm/order-confirm.component';
-import {HttpErrorInterceptor} from './core/interceptors/http.error.interceptor';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { SearchTableComponent } from './components/search-table/search-table.component';
+import { ImportDialogComponent } from './components/import-dialog/import-dialog.component';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
+import { ValueChangeComponent } from './components/value-change/value-change.component';
+import { CellComponent } from './components/cell/cell.component';
+import { HttpErrorInterceptor } from './core/interceptors/http.error.interceptor';
 
 @NgModule({
   declarations: [
@@ -47,7 +51,11 @@ import { SearchTableComponent } from './components/search-table/search-table.com
     ChooseViewComponent,
     OrderConfirmComponent,
     ConfirmDialogComponent,
-    SearchTableComponent
+    SearchTableComponent,
+    ImportDialogComponent,
+    ResetPasswordComponent,
+    ValueChangeComponent,
+    CellComponent
   ],
   imports: [
     BrowserModule,
