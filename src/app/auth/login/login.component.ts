@@ -61,6 +61,9 @@ export class LoginComponent implements OnInit {
       }
     }, (err) => {
       this.authError = err && err.error && err.error.message ? err.error.message : "Authentication failed";
+      if (this.authError && this.authError.includes('Duplicate')) {
+        this.authError = 'User already signed in';
+      }
       const RESET_PASSWORD_TAG = '925';
       if (this.authError.includes(RESET_PASSWORD_TAG)) {
         this.router.navigate(['/reset-password'], { queryParams: { username: this.form?.get('username')?.value }});

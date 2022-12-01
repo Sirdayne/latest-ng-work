@@ -20,4 +20,12 @@ export class ImportService {
     document.body.appendChild(link);
     link.click();
   }
+
+  saveExcel(filename, blob) {
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    const today = new Date();
+    link.download = `${filename}-${today.toLocaleDateString()}.xlsx`;
+    link.click();
+  }
 }

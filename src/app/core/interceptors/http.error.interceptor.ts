@@ -23,9 +23,9 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         if (error.status === 401) {
           this.router.navigateByUrl('login');
           this.tokenService.removeToken();
-          this.snackBar.open('Session expired', 'CLOSE', {
-            duration: 3000,
-          });
+          // this.snackBar.open('Session expired', 'CLOSE', {
+          //   duration: 3000,
+          // });
         }
         return throwError(error)
       })

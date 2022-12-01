@@ -31,6 +31,7 @@ import { ResetPasswordComponent } from './auth/reset-password/reset-password.com
 import { ValueChangeComponent } from './components/value-change/value-change.component';
 import { CellComponent } from './components/cell/cell.component';
 import { HttpErrorInterceptor } from './core/interceptors/http.error.interceptor';
+import { MarketViewSearchComponent } from './components/market-view-search/market-view-search.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { HttpErrorInterceptor } from './core/interceptors/http.error.interceptor
     ImportDialogComponent,
     ResetPasswordComponent,
     ValueChangeComponent,
-    CellComponent
+    CellComponent,
+    MarketViewSearchComponent
   ],
   imports: [
     BrowserModule,

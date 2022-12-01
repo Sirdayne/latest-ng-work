@@ -17,6 +17,7 @@ export class ChooseViewComponent implements OnInit, OnDestroy {
   downloadCSVSubject = new Subject();
   isSearchShown = false;
   subscription = new Subscription();
+  loading = true;
 
   constructor(private dialog: MatDialog) { }
 
@@ -27,7 +28,13 @@ export class ChooseViewComponent implements OnInit, OnDestroy {
     return this.view.replace('-', ' ').toUpperCase();
   }
 
-  get isDownloadCSVAvailable() {
+  get isNotMarketViewAndOrderEntry() {
+    return this.view === 'market-trades' ||
+           this.view === 'my-trades' ||
+           this.view === 'my-orders';
+  }
+
+  get isNotOrderEntry() {
     return this.view === 'market-view' ||
            this.view === 'market-trades' ||
            this.view === 'my-trades' ||
@@ -39,17 +46,23 @@ export class ChooseViewComponent implements OnInit, OnDestroy {
   }
 
   openImportDialog(view) {
-    const dialogRef = this.dialog.open(ImportDialogComponent, {
-      width: '320px',
-    });
+    // const dialogRef = this.dialog.open(ImportDialogComponent, {
+    //   width: '320px',
+    // });
+    //
+    // this.subscription.add(
+    //   dialogRef.afterClosed().subscribe(delimiter => {
+    //     if (delimiter) {
+    //       this.downloadCSVSubject.next({ view, delimiter });
+    //     }
+    //   })
+    // );
 
-    this.subscription.add(
-      dialogRef.afterClosed().subscribe(delimiter => {
-        if (delimiter) {
-          this.downloadCSVSubject.next({ view, delimiter });
-        }
-      })
-    );
+    this.downloadCSVSubject.next({ view });
+  }
+
+  setLoading(state) {
+    this.loading = state;
   }
 
   ngOnDestroy(): void {

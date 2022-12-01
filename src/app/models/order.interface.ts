@@ -19,4 +19,5 @@ export interface OrderI {
   partialQty: string;
   partialAmount: string;
   senderSubId: string;
+  username: string;
 }

@@ -1,6 +1,6 @@
 # Stage 1: Compile and Build angular codebase
 # Use official node image as the base image
-FROM node:16.13.0 as build
+FROM node:16.15.0 as build
 #Label for temporary images
 ARG REMOVE_TRIGGER
 LABEL remove=${REMOVE_TRIGGER}

@@ -36,7 +36,7 @@ export class ResetPasswordComponent implements OnInit {
               private snackBar: MatSnackBar,
               private store: Store<IAppState>) {
     this.form = fb.group({
-      username: ['', [Validators.required]],
+      username: [{ value: '', disabled: true }, [Validators.required]],
       password: ['', [Validators.required]],
       newPassword: ['', [Validators.required]]
     });

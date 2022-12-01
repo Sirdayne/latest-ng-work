@@ -1,20 +1,23 @@
-import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import { MyTradesService } from './my-trades.service';
 import { SocketService } from '../home/socket.service';
-import { Subject, Subscription } from 'rxjs';
+import {merge, of, Subject, Subscription} from 'rxjs';
 import { ImportService } from '../../shared/import.service';
 import { FormatDataService } from '../../shared/format-data.service';
 import {MatSort} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
+import {filter, finalize, switchMap} from 'rxjs/operators';
+import {MatPaginator} from "@angular/material/paginator";
+import {FilterTableI} from "../../models/filter-table.interface";
 
 @Component({
   selector: 'app-my-trades',
   templateUrl: './my-trades.component.html',
   styleUrls: ['./my-trades.component.css']
 })
-export class MyTradesComponent implements OnInit, OnDestroy {
+export class MyTradesComponent implements AfterViewInit, OnDestroy {
   @Input() downloadCSVSubject: Subject<any>;
   @Input() isSearchShown;
+  @Output() setLoading = new EventEmitter();
 
   tableColumns = [
     {
@@ -26,7 +29,7 @@ export class MyTradesComponent implements OnInit, OnDestroy {
       label: 'Side'
     },
     {
-      value: 'tradeId',
+      value: 'trdMatchId',
       label: 'Trade Id'
     },
     {
@@ -46,15 +49,15 @@ export class MyTradesComponent implements OnInit, OnDestroy {
       label: 'Period'
     },
     {
-      value: 'repoRate',
+      value: 'tradeRate',
       label: 'Rate'
     },
     {
-      value: 'quantity',
+      value: 'tradeQty',
       label: 'Quantity'
     },
     {
-      value: 'amount',
+      value: 'tradeAmount',
       label: 'Amount'
     },
     {
@@ -62,7 +65,7 @@ export class MyTradesComponent implements OnInit, OnDestroy {
       label: 'Repurchase Date'
     },
     {
-      value: 'repurchaseAmount',
+      value: 'tradeRepurchaseAmount',
       label: 'Repurchase Amount'
     },
     {
@@ -70,7 +73,7 @@ export class MyTradesComponent implements OnInit, OnDestroy {
       label: 'Delta Repo Income'
     },
     {
-      value: 'user',
+      value: 'username',
       label: 'User'
     },
     {
@@ -78,68 +81,120 @@ export class MyTradesComponent implements OnInit, OnDestroy {
       label: 'Investor'
     }
   ];
+  filterTableColumns;
 
-  initData;
-  dataSource;
+  data;
+
+  pageSize = 10;
+  pageSizeOptions = [10, 20, 50];
+  dataLength;
+  filters: FilterTableI;
 
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   subscription = new Subscription();
 
   constructor(private myTradesService: MyTradesService,
               private socketService: SocketService,
               private importService: ImportService,
-              private formatDataService: FormatDataService) { }
+              private formatDataService: FormatDataService) {
+    this.filterTableColumns = this.tableColumns.filter(col => col.value !== 'transactTime');
+  }
 
-  ngOnInit(): void {
-    this.getMyTrades();
-    this.subscription.add(this.socketService.messageSubject.subscribe(msg => {
-      if (msg === 'trades') {
-        this.getMyTrades();
+  ngAfterViewInit(): void {
+    this.getEntities();
+    this.onSocketMessage();
+    this.onPaginate();
+    this.onDownloadCSVSubject();
+  }
+
+  onSocketMessage() {
+    this.subscription.add(this.socketService.messageSubject.pipe(
+      filter(msg => msg === 'trades'),
+      switchMap(() => {
+        return this.fetchData();
+      })
+    ).subscribe((res: any) => {
+      if (res) {
+        this.setData(res);
       }
     }));
+  }
 
-    this.onDownloadCSVSubject();
+  onPaginate() {
+    this.subscription.add(merge(this.paginator.page, this.sort.sortChange).subscribe(() => {
+      this.getEntities();
+    }));
   }
 
   onDownloadCSVSubject() {
     this.subscription.add(this.downloadCSVSubject.subscribe(({ view, delimiter }) => {
       if (view === 'my-trades') {
-        this.importService.json2csv(view, this.dataSource._renderData._value, this.tableColumns, delimiter);
+        this.myTradesService.downloadExcel().subscribe(res => {
+          this.importService.saveExcel('my-trades', res);
+        })
       }
     }));
   }
 
-  getMyTrades() {
-    this.myTradesService.getMyTrades().subscribe(trades => {
-      this.initData = this.formatData(trades);
-      this.dataSource = new MatTableDataSource(this.initData);
-      this.dataSource.sort = this.sort;
+  fetchData() {
+    return this.myTradesService.getMyTrades(
+      this.paginator.pageSize,
+      this.offset,
+      this.filters && this.filters.value ? this.filters.value : '',
+      this.filters && this.filters.column ? this.formatDataService.camelToSnakeCase(this.filters.column) : '',
+      this.sort && this.sort.active ? this.formatDataService.camelToSnakeCase(this.sort.active) : '',
+      this.sort && this.sort.direction ? this.sort.direction : ''
+    )
+  }
+
+  getEntities() {
+    this.setLoading.emit(true);
+    this.fetchData().pipe(
+      finalize(() => {
+        this.setLoading.emit(false);
+      })
+    ).subscribe((res: any) => {
+      this.setData(res);
+    }, () => {
+      this.data = [];
     });
+  }
+
+  setData(res) {
+    const items = res && res.items ? res.items : [];
+    this.dataLength = res.total;
+    this.data = this.formatData(items);
   }
 
   formatData(data) {
     data = data.map(item => {
       item.transactTime = this.formatDataService.toDateTime(item.transactTime);
-      item.repoRate = this.formatDataService.toDecimalFour(item.repoRate);
-      item.amount = this.formatDataService.toDecimalTwo(item.amount);
+      item.tradeRate = this.formatDataService.toDecimalFour(item.tradeRate);
+      item.tradeAmount = this.formatDataService.toDecimalTwo(item.tradeAmount);
       item.repurchaseDate = this.formatDataService.toDate(item.repurchaseDate);
-      item.repurchaseAmount = this.formatDataService.toDecimalTwo(item.repurchaseAmount);
+      item.tradeRepurchaseAmount = this.formatDataService.toDecimalTwo(item.tradeRepurchaseAmount);
       item.deltaRepoIncome = this.formatDataService.toDecimalTwo(item.deltaRepoIncome);
       return item;
     });
     return data;
   }
 
-  setFilteredData(data) {
-    this.dataSource = new MatTableDataSource(data);
-    this.dataSource.sort = this.sort;
+  refetchEntities(filters) {
+    this.filters = filters;
+    this.paginator.firstPage();
+    this.getEntities();
   }
 
   ngOnDestroy(): void {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+  }
+
+  get offset() {
+    return this.paginator.pageIndex * this.paginator.pageSize ? this.paginator.pageIndex * this.paginator.pageSize : 0;
   }
 
   get displayedColumns() {

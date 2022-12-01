@@ -16,6 +16,7 @@ export class OrderConfirmComponent implements OnInit {
   @Input() orderConfirm: OrderConfirmI;
   @Output() setStep = new EventEmitter();
   @Output() resetParentForm = new EventEmitter();
+  @Input() offeredWaitingTime;
   form: FormGroup;
   loading = false;
   error;

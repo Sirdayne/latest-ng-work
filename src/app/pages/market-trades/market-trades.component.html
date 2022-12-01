@@ -1,12 +1,11 @@
 <div class="w-full" style="min-width: 1500px;">
 
-  <app-search-table [tableColumns]="tableColumns"
-                    [initData]="initData"
-                    (setFilteredData)="setFilteredData($event)"
+  <app-search-table [tableColumns]="filterTableColumns"
                     [isSearchShown]="isSearchShown"
+                    (refetchEntities)="refetchEntities($event)"
   ></app-search-table>
 
-  <table mat-table [dataSource]="dataSource" matSort>
+  <table mat-table [dataSource]="data" matSort>
 
     <ng-container matColumnDef="transactTime">
       <th mat-header-cell mat-sort-header *matHeaderCellDef>Time</th>
@@ -66,4 +65,6 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
+
+  <mat-paginator [pageSizeOptions]="pageSizeOptions" [pageSize]="pageSize" [length]="dataLength"></mat-paginator>
 </div>

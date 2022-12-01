@@ -58,7 +58,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     ReactiveFormsModule,
     FlexLayoutModule,
     MatSnackBarModule,
-    MatDialogModule
+    MatDialogModule,
+    MatProgressSpinnerModule
   ],
   exports: [
     MatTableModule,
@@ -89,7 +90,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     FlexLayoutModule,
     MatSnackBarModule,
     NoCommaPipe,
-    MatDialogModule
+    MatDialogModule,
+    MatProgressSpinnerModule
   ],
   providers: [
     DatePipe,

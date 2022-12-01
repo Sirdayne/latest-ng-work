@@ -22,6 +22,9 @@ export class OrderEntryComponent implements OnInit {
 
   orderConfirm: OrderConfirmI = {} as OrderConfirmI;
   error = '';
+  securities: string[];
+  periods;
+  offeredWaitingTime;
 
   constructor(private fb: FormBuilder,
               private store: Store<IAppState>,
@@ -41,6 +44,7 @@ export class OrderEntryComponent implements OnInit {
 
   ngOnInit(): void {
     this.onChange();
+    this.fetchSecurities();
   }
 
   onChange() {
@@ -52,12 +56,31 @@ export class OrderEntryComponent implements OnInit {
     this.f['side'].valueChanges.subscribe(type => {
       this.refreshNumValues();
     });
+
+    this.f['symbol'].valueChanges.subscribe(security => {
+      this.f['repoPeriod'].reset();
+      if (security) {
+        this.fetchPeriodsBySecurity(security);
+      }
+    });
   }
 
   refreshNumValues() {
     this.f['repoRate'].setValue('');
     this.f['repoAmount'].setValue('');
     this.f['repoQuantity'].setValue('');
+  }
+
+  fetchSecurities() {
+    this.orderEntryService.getSecuritites().subscribe(securities => {
+      this.securities = securities;
+    });
+  }
+
+  fetchPeriodsBySecurity(security) {
+    this.orderEntryService.getPeriodsBySecurity(security).subscribe(periods => {
+      this.periods = periods;
+    });
   }
 
   onSubmit() {
@@ -69,6 +92,7 @@ export class OrderEntryComponent implements OnInit {
     ).subscribe(res => {
       this.orderConfirm = res;
       this.step = 'order-confirm';
+      this.offeredWaitingTime = res.offeredWaitingTime;
     }, err => {
       this.error = err && err.error && err.error.message ? err.error.message : "Error: Invalid Data";
     });

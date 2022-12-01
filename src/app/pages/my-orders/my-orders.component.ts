@@ -1,35 +1,36 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MyOrdersService } from './my-orders.service';
-import { finalize } from 'rxjs/operators';
-import { OrderI } from '../../models/order.interface';
+import {catchError, filter, finalize, map, startWith, switchMap} from 'rxjs/operators';
 import { SocketService } from '../home/socket.service';
-import { Subject, Subscription } from 'rxjs';
+import {merge, of, Subject, Subscription} from 'rxjs';
 import { ImportService } from '../../shared/import.service';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { FormatDataService } from '../../shared/format-data.service';
-import { MatSort, Sort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatSort } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
+import {FilterTableI} from "../../models/filter-table.interface";
 
 @Component({
   selector: 'app-my-orders',
   templateUrl: './my-orders.component.html',
   styleUrls: ['./my-orders.component.css']
 })
-export class MyOrdersComponent implements OnInit, OnDestroy {
+export class MyOrdersComponent implements AfterViewInit, OnDestroy {
   @Input() downloadCSVSubject: Subject<any>;
   @Input() isSearchShown;
   @Input() isFirmViewer;
+  @Output() setLoading = new EventEmitter();
 
   tableColumns = [
     {
       value: 'transactTime',
       label: 'Time'
     },
-    {
-      value: 'clOrdId',
-      label: 'Client Order Id'
-    },
+    // {
+    //   value: 'clOrdId',
+    //   label: 'Client Order Id'
+    // },
     {
       value: 'orderId',
       label: 'Order Id'
@@ -91,15 +92,20 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
       label: 'Partial Amount'
     },
     {
-      value: 'senderSubId',
+      value: 'username',
       label: 'User'
     }
   ];
+  filterTableColumns;
 
-  initData;
-  dataSource;
-  loading = false;
+  data;
 
+  pageSize = 10;
+  pageSizeOptions = [10, 20, 50];
+  dataLength;
+  filters: FilterTableI;
+
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
   subscription = new Subscription();
@@ -108,36 +114,74 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
               private socketService: SocketService,
               private importService: ImportService,
               public dialog: MatDialog,
-              private formatDataService: FormatDataService) { }
+              private formatDataService: FormatDataService) {
+    this.filterTableColumns = this.tableColumns.filter(col => col.value !== 'transactTime');
+  }
 
-  ngOnInit(): void {
-    this.getMyOrders();
-    this.subscription.add(this.socketService.messageSubject.subscribe(msg => {
-      if (msg === 'orders') {
-        this.getMyOrders()
+  ngAfterViewInit(): void {
+    this.getEntities();
+    this.onSocketMessage();
+    this.onPaginate();
+    this.onDownloadCSVSubject();
+  }
+
+  onSocketMessage() {
+    this.subscription.add(this.socketService.messageSubject.pipe(
+      filter(msg => msg === 'orders'),
+      switchMap(() => {
+        return this.fetchData();
+      })
+    ).subscribe((res: any) => {
+      if (res) {
+        this.setData(res);
       }
     }));
+  }
 
-    this.onDownloadCSVSubject();
+  onPaginate() {
+    this.subscription.add(merge(this.paginator.page, this.sort.sortChange).subscribe(() => {
+      this.getEntities();
+    }));
   }
 
   onDownloadCSVSubject() {
     this.subscription.add(this.downloadCSVSubject.subscribe(({ view, delimiter }) => {
       if (view === 'my-orders') {
-        this.importService.json2csv(view, this.dataSource._renderData._value, this.tableColumns, delimiter);
+        this.myOrdersService.downloadExcel().subscribe(res => {
+          this.importService.saveExcel('my-orders', res);
+        })
       }
     }));
   }
 
-  getMyOrders() {
-    this.loading = true;
-    this.myOrdersService.getMyOrders().pipe(
-      finalize(() => this.loading = false)
-    ).subscribe(orders => {
-      this.initData = this.formatData(orders);
-      this.dataSource = new MatTableDataSource(this.initData);
-      this.dataSource.sort = this.sort;
+  fetchData() {
+    return this.myOrdersService.getMyOrders(
+      this.paginator.pageSize,
+      this.offset,
+      this.filters && this.filters.value ? this.filters.value : '',
+      this.filters && this.filters.column ? this.formatDataService.camelToSnakeCase(this.filters.column) : '',
+      this.sort && this.sort.active ? this.formatDataService.camelToSnakeCase(this.sort.active) : '',
+      this.sort && this.sort.direction ? this.sort.direction : ''
+    )
+  }
+
+  getEntities() {
+    this.setLoading.emit(true);
+    this.fetchData().pipe(
+      finalize(() => {
+        this.setLoading.emit(false);
+      })
+    ).subscribe((res: any) => {
+      this.setData(res);
+    }, () => {
+      this.data = [];
     });
+  }
+
+  setData(res) {
+    const items = res && res.items ? res.items : [];
+    this.dataLength = res.total;
+    this.data = this.formatData(items);
   }
 
   formatData(data) {
@@ -153,19 +197,13 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
     return data;
   }
 
-  get displayedColumns() {
-    const arr = this.tableColumns.map(col => col.value);
-    arr.push('actions');
-    return arr;
-  }
-
   cancelOrder(order) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '260px',
       data: {
         id: order.clOrdId,
-        title: `Cancer order?`,
-        content: `Order Id: ${order.clOrdId}`
+        title: `Cancel order?`,
+        content: `Order Id: ${order.orderId}`
       },
     });
 
@@ -178,14 +216,25 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
     );
   }
 
-  setFilteredData(data) {
-    this.dataSource = new MatTableDataSource(data);
-    this.dataSource.sort = this.sort;
+  refetchEntities(filters) {
+    this.filters = filters;
+    this.paginator.firstPage();
+    this.getEntities();
   }
 
   ngOnDestroy() {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+  }
+
+  get offset() {
+    return this.paginator.pageIndex * this.paginator.pageSize ? this.paginator.pageIndex * this.paginator.pageSize : 0;
+  }
+
+  get displayedColumns() {
+    const arr = this.tableColumns.map(col => col.value);
+    arr.push('actions');
+    return arr;
   }
 }

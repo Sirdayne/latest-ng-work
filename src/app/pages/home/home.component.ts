@@ -79,6 +79,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     ).subscribe(role => {
       this.role = role;
       this.getFromStorage();
+      if (this.isFirmViewer) {
+        this.removeOrderEntryFromLayouts();
+      }
     }));
   }
 
@@ -123,9 +126,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (layouts) {
       try {
         this.layouts = JSON.parse(layouts);
-        if (this.isFirmViewer) {
-          this.removeOrderEntryFromLayouts();
-        }
       } catch (e) {
         console.log('Parse Cache Error:' + e);
       }

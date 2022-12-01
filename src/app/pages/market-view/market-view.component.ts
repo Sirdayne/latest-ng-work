@@ -1,8 +1,8 @@
-import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MarketViewService } from './market-view.service';
 import {SocketService} from '../home/socket.service';
-import {finalize} from 'rxjs/operators';
-import { Subject, Subscription } from 'rxjs';
+import {filter, finalize, switchMap} from 'rxjs/operators';
+import {of, Subject, Subscription} from 'rxjs';
 import { ImportService } from '../../shared/import.service';
 import { FormatDataService } from '../../shared/format-data.service';
 import {MatSort} from '@angular/material/sort';
@@ -23,7 +23,6 @@ export class MarketViewComponent implements OnInit, OnDestroy {
   state = 'market-view';
   security;
   period;
-  loading = false;
 
   @ViewChild(MatSort) sort: MatSort;
 
@@ -129,13 +128,22 @@ export class MarketViewComponent implements OnInit, OnDestroy {
               private formatDataService: FormatDataService) { }
 
   ngOnInit(): void {
-    this.getMarketView();
-    this.subscription.add(this.socketService.messageSubject.subscribe(msg => {
-      if (msg === 'market_view') {
-        this.getMarketView()
+    this.getEntities();
+    this.onSocketMessage();
+    this.onDownloadCSVSubject();
+  }
+
+  onSocketMessage() {
+    this.subscription.add(this.socketService.messageSubject.pipe(
+      filter(msg => msg === 'market_view'),
+      switchMap(() => {
+        return this.fetchData();
+      })
+    ).subscribe((res: any) => {
+      if (res) {
+        this.setData(res);
       }
     }));
-    this.onDownloadCSVSubject();
   }
 
   onDownloadCSVSubject() {
@@ -146,16 +154,21 @@ export class MarketViewComponent implements OnInit, OnDestroy {
     }));
   }
 
-  getMarketView() {
-    this.loading = true;
-    this.marketViewService.getMarketView().pipe(
-      finalize(() => this.loading = false)
-    ).subscribe(marketView => {
-      this.prevInitData = this.initData ? this.initData : [];
-      this.initData = this.formatData(marketView);
-      this.dataSource = new MatTableDataSource(this.initData);
-      this.dataSource.sort = this.sort;
+  fetchData() {
+    return this.marketViewService.getMarketView();
+  }
+
+  getEntities() {
+    this.fetchData().subscribe((res: any) => {
+      this.setData(res)
     });
+  }
+
+  setData(res) {
+    this.prevInitData = this.initData ? this.initData : [];
+    this.initData = this.formatData(res);
+    this.dataSource = new MatTableDataSource(this.initData);
+    this.dataSource.sort = this.sort;
   }
 
   formatData(data) {

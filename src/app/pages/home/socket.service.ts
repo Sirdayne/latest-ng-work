@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { TokenService } from '../../auth/token.service';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -12,32 +10,21 @@ export class SocketService {
   socket: WebSocket;
   messageSubject = new Subject<String>();
   interval;
+  throttledMessages: String[] = [];
 
-  constructor(private tokenService: TokenService,
-              private httpService: HttpClient,
-              private router: Router) {
+  constructor(private tokenService: TokenService) {
   }
 
   createSocketConnection() {
     const accessToken = this.tokenService.getToken();
     if (accessToken) {
       this.socket = new WebSocket(`${environment.wsBase}/${accessToken}`);
-      this.heartbeat();
       this.onOpen();
-      this.onMessage();
       this.onClose();
       this.onError();
+      this.onMessage();
+      this.throttleMessages();
     }
-  }
-
-  heartbeat() {
-    this.clearInterval();
-    this.interval = setInterval(() => {
-      const msg = {
-        event: 'ping',
-      };
-      this.socket.send(JSON.stringify(msg));
-    }, 10000);
   }
 
   onOpen() {
@@ -46,17 +33,9 @@ export class SocketService {
     }
   }
 
-  onMessage() {
-    this.socket.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
-      this.messageSubject.next(msg.event);
-    }
-  }
-
   onClose() {
     this.socket.onclose = () => {
       console.log('socket connection closed');
-      this.createSocketConnection();
     }
   }
 
@@ -64,11 +43,50 @@ export class SocketService {
     this.socket.onerror = (err) => {
       console.log('socket connection closed due to err ' + err);
       this.socket.close();
-      this.clearInterval();
+      this.removeInterval();
     }
   }
 
-  clearInterval() {
+  onMessage() {
+    this.socket.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      if (msg && msg.event) {
+        this.addToThrottledMessages(msg.event)
+      }
+
+    }
+  }
+
+  addToThrottledMessages(msg) {
+    const found = this.throttledMessages.find(item => item === msg);
+    if (!found) {
+      this.throttledMessages.push(msg);
+    }
+  }
+
+  throttleMessages() {
+    this.removeInterval();
+    this.interval = setInterval(() => {
+      this.heartbeat();
+      this.sendAndClearMessages();
+    }, 1000);
+  }
+
+  heartbeat() {
+    const msg = {
+      event: 'ping',
+    };
+    this.socket.send(JSON.stringify(msg));
+  }
+
+  sendAndClearMessages() {
+    this.throttledMessages.forEach(msg => {
+      this.messageSubject.next(msg);
+    });
+    this.throttledMessages = [];
+  }
+
+  removeInterval() {
     if (this.interval) {
       clearInterval(this.interval);
     }

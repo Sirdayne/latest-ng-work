@@ -29,3 +29,8 @@
   border-top-color: #000000;
   animation: spinner .8s linear infinite;
 }
+
+.mat-paginator-outer-container .mat-paginator-container {
+  justify-content: flex-start;
+  margin-left: 10px;
+}

@@ -1,10 +1,10 @@
 <div *ngIf="state === 'market-view'" class="w-full inline-block" style="min-width: 2600px;">
 
-  <app-search-table [tableColumns]="tableColumns"
-                    [initData]="initData"
-                    (setFilteredData)="setFilteredData($event)"
-                    [isSearchShown]="isSearchShown"
-  ></app-search-table>
+  <app-market-view-search [tableColumns]="tableColumns"
+                          [initData]="initData"
+                          (setFilteredData)="setFilteredData($event)"
+                          [isSearchShown]="isSearchShown"
+  ></app-market-view-search >
 
   <table mat-table [dataSource]="dataSource" matSort>
 

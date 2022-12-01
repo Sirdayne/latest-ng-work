@@ -17,6 +17,7 @@ export interface OrderConfirmI {
   repoPrice: number;
   investor: string;
   confirmReqID: number;
+  offeredWaitingTime: string;
 }
 
 @Injectable({
@@ -81,5 +82,13 @@ export class OrderEntryService {
 
   rejectOrder(confirmReqID) {
     return this.httpService.post(`/order/confirm`, { confirmType: '3', confirmReqID});
+  }
+
+  getSecuritites() {
+    return this.httpService.get<string[]>('/securities');
+  }
+
+  getPeriodsBySecurity(security) {
+    return this.httpService.get(`/periods_by_security/${security}`);
   }
 }

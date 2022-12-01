@@ -5,14 +5,18 @@
       <div class="mt-2">
         <mat-form-field>
           <mat-label>Security</mat-label>
-          <input matInput formControlName="symbol">
+          <mat-select required formControlName="symbol">
+            <mat-option *ngFor="let item of securities" [value]="item">{{item}}</mat-option>
+          </mat-select>
         </mat-form-field>
       </div>
 
       <div>
         <mat-form-field>
           <mat-label>Period</mat-label>
-          <input matInput formControlName="repoPeriod" type="number">
+          <mat-select required formControlName="repoPeriod">
+            <mat-option *ngFor="let item of periods" [value]="item">{{item}}</mat-option>
+          </mat-select>
         </mat-form-field>
       </div>
 
@@ -46,21 +50,21 @@
       <div *ngIf="isTypeLimit">
         <mat-form-field>
           <mat-label>Rate</mat-label>
-          <input matInput formControlName="repoRate" type="number">
+          <input matInput formControlName="repoRate" type="number" min="0">
         </mat-form-field>
       </div>
 
       <div *ngIf="!form.get('repoQuantity').value">
         <mat-form-field>
           <mat-label>Amount</mat-label>
-          <input matInput formControlName="repoAmount" type="number">
+          <input matInput formControlName="repoAmount" type="number" min="0">
         </mat-form-field>
       </div>
 
       <div *ngIf="isSideSell && !form.get('repoAmount').value">
         <mat-form-field>
           <mat-label>Quantity</mat-label>
-          <input matInput formControlName="repoQuantity" type="number">
+          <input matInput formControlName="repoQuantity" type="number" min="0">
         </mat-form-field>
       </div>
 
@@ -82,5 +86,6 @@
     [orderConfirm]="orderConfirm"
     (setStep)="setStep($event)"
     (resetParentForm)="resetParentForm()"
+    [offeredWaitingTime]="offeredWaitingTime"
   ></app-order-confirm>
 </div>
